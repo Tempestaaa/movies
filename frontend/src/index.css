@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hide {
+  display: none;
+}
+
+img {
+  @apply max-w-full max-h-full object-contain;
+}
+
+label {
+  @apply !bg-primary rounded-full py-1;
+}
+
+.active {
+  @apply bg-secondary hover:!bg-secondary/80 font-bold;
+}
+
+form[data-form="create-movie"] > section > label,
+form[data-form="create-movie"] > section > div > label {
+  @apply !text-text !bg-transparent whitespace-nowrap;
+}
