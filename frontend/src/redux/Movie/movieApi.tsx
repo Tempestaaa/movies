@@ -13,11 +13,11 @@ export const movieApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Movie"],
     }),
 
-    updateMovie: builder.mutation({
+    updateMovie: builder.mutation<MovieType, { _id: string; data: MovieType }>({
       query: (data) => ({
         url: `${MOVIES_URL}/${data._id}`,
         method: "PUT",
-        body: data,
+        body: data.data,
       }),
       invalidatesTags: ["Movie"],
     }),
@@ -35,7 +35,7 @@ export const movieApi = apiSlice.injectEndpoints({
       providesTags: ["Movie"],
     }),
 
-    getMovie: builder.query({
+    getMovie: builder.query<MovieType, string>({
       query: (id) => `${MOVIES_URL}/movie/${id}`,
       providesTags: ["Movie"],
     }),

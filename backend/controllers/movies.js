@@ -100,6 +100,7 @@ export const createMovie = expressAsyncHandler(async (req, res) => {
     genres,
     cast,
     rating,
+    trailer,
   } = req.body;
   const movieExists = await Movies.findOne({ name });
   if (movieExists) {
@@ -118,6 +119,7 @@ export const createMovie = expressAsyncHandler(async (req, res) => {
     genres,
     cast,
     rating,
+    trailer,
   });
   if (movie) {
     const savedMovie = await movie.save();
