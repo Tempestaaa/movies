@@ -17,6 +17,7 @@ import { useGetGenresQuery } from "../../redux/Genre/genreApi";
 import { toast } from "react-toastify";
 
 const CreateMovie = () => {
+  const [cast, setCast] = useState([""]);
   const [file, setFile] = useState<File | string>();
   const [uploadPoster] = useUploadPosterMutation();
   const [createMovie] = useCreateMovieMutation();
@@ -25,7 +26,8 @@ const CreateMovie = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Omit<MovieType, "_id">>({
+    reset,
+  } = useForm<Omit<MovieType, "_id" | "cast">>({
     mode: "all",
     defaultValues: {
       duration: 0,
@@ -34,7 +36,9 @@ const CreateMovie = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<Omit<MovieType, "_id">> = async (data) => {
+  const onSubmit: SubmitHandler<Omit<MovieType, "_id" | "cast">> = async (
+    data
+  ) => {
     let uploadImagePath = null;
     if (file) {
       const formData = new FormData();
@@ -53,12 +57,17 @@ const CreateMovie = () => {
         await createMovie({
           ...data,
           image: uploadImagePath,
+          cast: cast.filter((i) => i),
         }).unwrap();
         toast.success("Movie created successfully");
       } catch (error: any) {
-        return console.log(error?.data?.message || error.error);
+        return toast.error(error?.data?.message || error.error);
       }
     }
+
+    reset();
+    setFile(undefined);
+    setCast([""]);
   };
 
   return (
@@ -73,7 +82,7 @@ const CreateMovie = () => {
           data-form="create-movie"
           className="flex gap-4 flex-col md:flex-row"
         >
-          <section className="w-1/3 rounded-md flex-shrink-0 overflow-hidden border-2 border-dashed border-blue-500 max-h-[550px]">
+          <section className="w-1/3 rounded-md flex-shrink-0 overflow-hidden border-2 border-dashed border-blue-500 max-h-[560px]">
             <Label>
               <div className="w-full h-full">
                 {file && (
@@ -95,23 +104,48 @@ const CreateMovie = () => {
           <section className="flex-1">
             <Label>
               Name: <span className="text-xs text-secondary">( * )</span>
-              <TextInput {...register("name")} />
+              <TextInput
+                {...register("name", {
+                  required: "Name is required",
+                })}
+              />
+              {errors.name && (
+                <p className="text-xs text-secondary">{errors.name.message}</p>
+              )}
             </Label>
             <Label>
               Description: <span className="text-xs text-secondary">( * )</span>
-              <Textarea rows={3} {...register("desc")} />
+              <Textarea
+                rows={3}
+                {...register("desc", { required: "Description is required" })}
+              />
+              {errors.desc && (
+                <p className="text-xs text-secondary">{errors.desc.message}</p>
+              )}
             </Label>
             <Label>
               Director: <span className="text-xs text-secondary">( * )</span>
-              <TextInput {...register("director")} />
+              <TextInput
+                {...register("director", { required: "Director is required" })}
+              />
+              {errors.director && (
+                <p className="text-xs text-secondary">
+                  {errors.director.message}
+                </p>
+              )}
             </Label>
             <Label>
               Cast (comma-seperate):
-              <TextInput />
+              <TextInput
+                value={cast && cast.join(", ")}
+                onChange={(e) => setCast(e.target.value.split(", "))}
+              />
             </Label>
             <Label className="capitalize">
               Genre: <span className="text-xs text-secondary">( * )</span>
-              <Select {...register("genres")}>
+              <Select
+                {...register("genres", { required: "Genre is required" })}
+              >
                 {genres &&
                   genres.map((item) => (
                     <option
@@ -123,32 +157,104 @@ const CreateMovie = () => {
                     </option>
                   ))}
               </Select>
+              {errors.genres && (
+                <p className="text-xs text-secondary">
+                  {errors.genres.message}
+                </p>
+              )}
             </Label>
             <Label>
               Trailer: <span className="text-xs text-secondary">( * )</span>
-              <TextInput {...register("trailer")} />
+              <TextInput
+                {...register("trailer", { required: "Trailer is required" })}
+              />
+              {errors.trailer && (
+                <p className="text-xs text-secondary">
+                  {errors.trailer.message}
+                </p>
+              )}
             </Label>
 
             <div className="flex flex-col md:flex-row gap-4">
               <Label>
                 Language: <span className="text-xs text-secondary">( * )</span>
-                <TextInput {...register("language")} />
+                <TextInput
+                  {...register("language", {
+                    required: "Language is required",
+                  })}
+                />
+                {errors.language && (
+                  <p className="text-xs text-secondary">
+                    {errors.language.message}
+                  </p>
+                )}
               </Label>
               <Label>
                 Duration: <span className="text-xs text-secondary">( * )</span>
-                <TextInput type="number" step="any" {...register("duration")} />
+                <TextInput
+                  type="number"
+                  step="any"
+                  {...register("duration", {
+                    validate: (input) => {
+                      if (input < 0) return "Duration can't be negative";
+                      return true;
+                    },
+                  })}
+                />
+                {errors.duration && (
+                  <p className="text-xs text-secondary">
+                    {errors.duration.message}
+                  </p>
+                )}
               </Label>
               <Label>
                 Year: <span className="text-xs text-secondary">( * )</span>
-                <TextInput type="number" step="any" {...register("year")} />
+                <TextInput
+                  type="number"
+                  step="any"
+                  {...register("year", {
+                    validate: (input) => {
+                      if (input < 0) return "Year can't be negative";
+                      return true;
+                    },
+                  })}
+                />
+                {errors.year && (
+                  <p className="text-xs text-secondary">
+                    {errors.year.message}
+                  </p>
+                )}
               </Label>
               <Label>
                 Rating: <span className="text-xs text-secondary">( * )</span>
-                <TextInput type="number" step="any" {...register("rating")} />
+                <TextInput
+                  type="number"
+                  step="any"
+                  {...register("rating", {
+                    validate: (input) => {
+                      if (input < 0) return "Rating can't be negative";
+                      return true;
+                    },
+                  })}
+                />
+                {errors.rating && (
+                  <p className="text-xs text-secondary">
+                    {errors.rating.message}
+                  </p>
+                )}
               </Label>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <Button color="blue">Reset</Button>
+              <Button
+                onClick={() => {
+                  reset();
+                  setFile(undefined);
+                  setCast([""]);
+                }}
+                color="blue"
+              >
+                Reset
+              </Button>
               <Button type="submit" color="failure">
                 Submit
               </Button>

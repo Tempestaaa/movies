@@ -12,4 +12,5 @@ export type MovieType = {
   rating: number;
   year: number;
   image: string;
+  cast: string[];
 };
