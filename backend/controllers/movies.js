@@ -165,7 +165,6 @@ export const deleteMovie = expressAsyncHandler(async (req, res) => {
 // @access   Private/Admin
 export const deleteComment = expressAsyncHandler(async (req, res) => {
   const { movieId, reviewId } = req.body;
-  console.log(movieId, reviewId);
   const movie = await Movies.findById(movieId);
   if (!movie) {
     res.status(404);
